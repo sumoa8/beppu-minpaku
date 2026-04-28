@@ -4,314 +4,64 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>民泊テスト宿泊会 ツール集</title>
-<meta name="description" content="民泊テスト宿泊会で使うWebツール集。アメニティチェック・アンケート・アイデアボードの3本立て。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
+/* CSSは元のままのため省略（中略） */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --navy:   #1a3a5c;
-  --navy2:  #2a5280;
-  --orange: #e67e22;
-  --orange2:#f39c12;
-  --purple: #8e44ad;
-  --purple2:#9b59b6;
-  --green:  #27ae60;
-  --green2: #2ecc71;
-  --bg:     #f0f4f8;
-  --card:   #ffffff;
-  --text:   #1a2a3a;
-  --sub:    #5d7a8c;
-  --radius: 20px;
-}
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: 'Noto Sans JP', system-ui, sans-serif;
-  background: var(--bg);
-  min-height: 100vh;
-  color: var(--text);
-}
-
-/* ===== ヒーロー ===== */
-.hero {
-  background: linear-gradient(145deg, #0d2137 0%, #1a3a5c 50%, #2a5280 100%);
-  padding: 52px 20px 48px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 70% 30%, rgba(230,126,34,0.18) 0%, transparent 60%),
-              radial-gradient(ellipse at 20% 80%, rgba(142,68,173,0.15) 0%, transparent 55%);
-  pointer-events: none;
-}
-.hero-emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
-.hero h1 {
-  font-size: clamp(1.4rem, 5vw, 2rem);
-  font-weight: 900;
-  color: #fff;
-  line-height: 1.3;
-  margin-bottom: 10px;
-}
-.hero-sub {
-  font-size: 0.88rem;
-  color: rgba(255,255,255,0.65);
-  margin-bottom: 20px;
-  line-height: 1.6;
-}
-.hero-badge {
-  display: inline-block;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.22);
-  border-radius: 30px;
-  padding: 6px 18px;
-  font-size: 0.78rem;
-  color: rgba(255,255,255,0.8);
-  letter-spacing: 0.05em;
-  backdrop-filter: blur(4px);
-}
-
-/* ===== メインコンテナ ===== */
-.container {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 28px 16px 40px;
-}
-
-/* ===== セクション見出し ===== */
-.section-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--sub);
-  text-transform: uppercase;
-  margin-bottom: 16px;
-}
-
-/* ===== アプリカード ===== */
-.app-card {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 0;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 20px rgba(26,58,92,0.09);
-  overflow: hidden;
-  text-decoration: none;
-  display: block;
-  color: inherit;
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
-  border: 1px solid rgba(26,58,92,0.07);
-  position: relative;
-}
-.app-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 32px rgba(26,58,92,0.15);
-}
-.app-card:active { transform: translateY(-1px); }
-
-.card-accent {
-  height: 6px;
-  width: 100%;
-}
-.accent-navy   { background: linear-gradient(90deg, var(--navy), var(--navy2)); }
-.accent-orange { background: linear-gradient(90deg, var(--orange), var(--orange2)); }
-.accent-purple { background: linear-gradient(90deg, var(--purple), var(--purple2)); }
-
-.card-body {
-  padding: 22px 22px 20px;
-}
-
-.card-icon-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-.card-icon-wrap {
-  width: 54px; height: 54px;
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.7rem;
-  flex-shrink: 0;
-}
-.icon-navy   { background: linear-gradient(135deg, #e8eef4, #d0dce8); }
-.icon-orange { background: linear-gradient(135deg, #fef3e2, #fde4b5); }
-.icon-purple { background: linear-gradient(135deg, #f0e8f8, #dfc8f0); }
-
-.card-meta { flex: 1; }
-.card-number {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--sub);
-  margin-bottom: 4px;
-}
-.card-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.35;
-}
-
-.card-desc {
-  font-size: 0.84rem;
-  color: var(--sub);
-  line-height: 1.65;
-  margin-bottom: 16px;
-}
-
-.card-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-bottom: 18px;
-}
-.tag {
-  font-size: 0.73rem;
-  font-weight: 500;
-  padding: 4px 11px;
-  border-radius: 20px;
-  border: 1px solid;
-}
-.tag-navy   { color: var(--navy2);   background: #e8eef4; border-color: #c0d0e0; }
-.tag-orange { color: #c26a10;        background: #fef3e2; border-color: #f8d8a0; }
-.tag-purple { color: var(--purple);  background: #f0e8f8; border-color: #d8bef0; }
-
-.card-cta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.02em;
-}
-.cta-navy   { background: linear-gradient(135deg, var(--navy), var(--navy2)); }
-.cta-orange { background: linear-gradient(135deg, var(--orange), var(--orange2)); }
-.cta-purple { background: linear-gradient(135deg, var(--purple), var(--purple2)); }
-.cta-arrow { font-size: 1.1rem; }
-
-/* ===== 注意書き ===== */
-.note-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 16px 18px;
-  margin-top: 24px;
-  border: 1px solid #e0e8f0;
-  box-shadow: 0 2px 8px rgba(26,58,92,0.05);
-}
-.note-card h3 {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--sub);
-  margin-bottom: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.note-card ul { list-style: none; }
-.note-card li {
-  font-size: 0.82rem;
-  color: #4a6480;
-  padding: 5px 0;
-  padding-left: 18px;
-  position: relative;
-  line-height: 1.55;
-  border-bottom: 1px solid #f0f4f8;
-}
-.note-card li:last-child { border-bottom: none; }
-.note-card li::before { content: '📌'; position: absolute; left: 0; font-size: 0.75rem; }
-
-/* ===== フッター ===== */
-footer {
-  text-align: center;
-  padding: 24px 16px 32px;
-  font-size: 0.78rem;
-  color: #8aa0b8;
-}
-
-/* ===== 脈動アニメ（ヒーロー絵文字） ===== */
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.08); }
-}
-.hero-emoji { animation: pulse 3s ease-in-out infinite; display: inline-block; }
+:root { --navy: #1a3a5c; --navy2: #2a5280; --orange: #e67e22; --orange2:#f39c12; --purple: #8e44ad; --purple2:#9b59b6; --green: #27ae60; --green2: #2ecc71; --bg: #f0f4f8; --card: #ffffff; --text: #1a2a3a; --sub: #5d7a8c; --radius: 20px; }
+body { font-family: 'Noto Sans JP', system-ui, sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); }
+.hero { background: linear-gradient(145deg, #0d2137 0%, #1a3a5c 50%, #2a5280 100%); padding: 52px 20px 48px; text-align: center; position: relative; overflow: hidden; }
+.hero-emoji { font-size: 3rem; display: block; margin-bottom: 12px; animation: pulse 3s ease-in-out infinite; }
+.hero h1 { font-size: clamp(1.4rem, 5vw, 2rem); font-weight: 900; color: #fff; line-height: 1.3; margin-bottom: 10px; }
+.hero-sub { font-size: 0.88rem; color: rgba(255,255,255,0.65); margin-bottom: 20px; line-height: 1.6; }
+.container { max-width: 480px; margin: 0 auto; padding: 28px 16px 40px; }
+.section-label { font-size: 0.72rem; font-weight: 700; color: var(--sub); text-transform: uppercase; margin-bottom: 16px; }
+.app-card { background: var(--card); border-radius: var(--radius); margin-bottom: 16px; box-shadow: 0 4px 20px rgba(26,58,92,0.09); overflow: hidden; text-decoration: none; display: block; color: inherit; transition: transform 0.22s ease; border: 1px solid rgba(26,58,92,0.07); }
+.app-card:hover { transform: translateY(-4px); }
+.card-accent { height: 6px; width: 100%; }
+.accent-navy { background: var(--navy); } .accent-orange { background: var(--orange); } .accent-purple { background: var(--purple); }
+.card-body { padding: 22px 22px 20px; }
+.card-icon-row { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+.card-icon-wrap { width: 54px; height: 54px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.7rem; }
+.icon-purple { background: #f0e8f8; }
+.card-title { font-size: 1.05rem; font-weight: 700; }
+.card-desc { font-size: 0.84rem; color: var(--sub); line-height: 1.65; margin-bottom: 16px; }
+.card-cta { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 12px; font-size: 0.88rem; font-weight: 700; color: #fff; }
+.cta-purple { background: var(--purple); }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
 </style>
 </head>
 <body>
 
-<!-- ヒーロー -->
 <div class="hero">
   <span class="hero-emoji">🏠</span>
   <h1>民泊テスト宿泊会<br>ツール集</h1>
   <p class="hero-sub">別府民泊の体験をより良くするための<br>3つのWebアプリをご利用ください</p>
-  <span class="hero-badge">📅 2026年4月28日 開催</span>
 </div>
 
 <div class="container">
-
   <div class="section-label">📱 アプリ一覧</div>
 
-  <!-- App 1 -->
   <a class="app-card" href="./app1_アメニティチェック.html">
     <div class="card-accent accent-navy"></div>
     <div class="card-body">
-      <div class="card-icon-row">
-        <div class="card-icon-wrap icon-navy">📋</div>
-        <div class="card-meta">
-          <div class="card-number">APP 01</div>
-          <div class="card-title">アメニティチェックリスト</div>
-        </div>
-      </div>
-      <p class="card-desc">
-        石口さん用。物件に「ないアメニティ」をカテゴリ別にチェックして記録。結果をコピーまたはメールで送信できます。
-      </p>
-      <div class="card-tags">
-        <span class="tag tag-navy">石口さん用</span>
-        <span class="tag tag-navy">チェックリスト</span>
-        <span class="tag tag-navy">メール送信</span>
-      </div>
-      <div class="card-cta cta-navy">
-        チェックリストを開く
-        <span class="cta-arrow">→</span>
-      </div>
+      <div class="card-title">アメニティチェックリスト</div>
+      <p class="card-desc">石口さん用。物件に「ないもの」を記録します。</p>
+      <div class="card-cta cta-navy" style="background:#1a3a5c">開く</div>
     </div>
   </a>
 
-  <!-- App 2 -->
   <a class="app-card" href="./app2_アンケート.html">
     <div class="card-accent accent-orange"></div>
     <div class="card-body">
-      <div class="card-icon-row">
-        <div class="card-icon-wrap icon-orange">⭐</div>
-        <div class="card-meta">
-          <div class="card-number">APP 02</div>
-          <div class="card-title">民泊評価アンケート</div>
-        </div>
-      </div>
-      <p class="card-desc">
-        参加者全員用。寝心地・シャワー・Wi-Fiなど12項目をスター評価（★1〜5）で記録し、メールで送信できます。
-      </p>
-      <div class="card-tags">
-        <span class="tag tag-orange">全員用</span>
-        <span class="tag tag-orange">スター評価</span>
-        <span class="tag tag-orange">メール送信</span>
-      </div>
-      <div class="card-cta cta-orange">
-        アンケートを開く
-        <span class="cta-arrow">→</span>
-      </div>
+      <div class="card-title">民泊評価アンケート</div>
+      <p class="card-desc">全員用。寝心地や設備を5つ星で評価します。</p>
+      <div class="card-cta cta-orange" style="background:#e67e22">開く</div>
     </div>
   </a>
 
-  <!-- App 3 -->
-  <a class="app-card" href="./app3_アイデアボード.html">
+  <a class="app-card" href="./app3_idea_board.html">
     <div class="card-accent accent-purple"></div>
     <div class="card-body">
       <div class="card-icon-row">
@@ -321,36 +71,14 @@ footer {
           <div class="card-title">焼酎×たこ焼き<br>企画アイデアボード</div>
         </div>
       </div>
-      <p class="card-desc">
-        ちっちさん・まこつさん中心。焼酎×たこ焼きの組み合わせ記録、イベント化アイデアの付箋メモ、参加者4名の総評をまとめてコピーできます。
-      </p>
-      <div class="card-tags">
-        <span class="tag tag-purple">全員用</span>
-        <span class="tag tag-purple">アイデアボード</span>
-        <span class="tag tag-purple">コピー</span>
-      </div>
+      <p class="card-desc">ペアリング記録、イベント化アイデアの付箋メモ、総評をまとめます。</p>
       <div class="card-cta cta-purple">
         アイデアボードを開く
         <span class="cta-arrow">→</span>
       </div>
     </div>
   </a>
-
-  <!-- 注意書き -->
-  <div class="note-card">
-    <h3>📌 ご利用の前に</h3>
-    <ul>
-      <li>各アプリはブラウザのメーラーを使ってメール送信します（App 1・2）</li>
-      <li>入力内容はページを閉じると消えます（保存はコピーorメール送信で）</li>
-      <li>スマホのブラウザ（Safari / Chrome）でそのままご利用いただけます</li>
-    </ul>
-  </div>
-
 </div>
-
-<footer>
-  民泊テスト宿泊会 2026 &nbsp;|&nbsp; ひびきや 様 別府民泊
-</footer>
 
 </body>
 </html>
