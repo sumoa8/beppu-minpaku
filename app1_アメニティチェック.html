@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アメニティチェックリスト（石口さん用）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans JP', system-ui, sans-serif;
+  background: linear-gradient(160deg, #f0f4f8 0%, #e8eef4 100%);
+  min-height: 100vh;
+  padding: 16px;
+  color: #1a2a3a;
+}
+
+.container { max-width: 480px; margin: 0 auto; }
+
+/* ヘッダー */
+header {
+  text-align: center;
+  padding: 28px 16px 20px;
+}
+header .emoji { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+header h1 { font-size: 1.35rem; font-weight: 700; color: #1a3a5c; margin-bottom: 6px; }
+header p { font-size: 0.82rem; color: #4a6480; }
+
+/* 操作説明カード */
+.info-card {
+  background: linear-gradient(135deg, #1a3a5c, #2a5280);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  color: #fff;
+}
+.info-card h2 { font-size: 0.82rem; font-weight: 700; opacity: 0.7; margin-bottom: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+.info-card ul { list-style: none; }
+.info-card li {
+  font-size: 0.875rem;
+  padding: 6px 0;
+  padding-left: 22px;
+  position: relative;
+  opacity: 0.93;
+  line-height: 1.5;
+}
+.info-card li::before { content: '✔'; position: absolute; left: 0; color: #7ec8e3; font-size: 0.8rem; }
+
+/* カテゴリアコーディオン */
+.category {
+  background: #fff;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(26,58,92,0.07);
+  border: 1px solid #dce8f0;
+}
+.cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.18s;
+}
+.cat-header:hover { background: #f4f8fc; }
+.cat-header-left { display: flex; align-items: center; gap: 10px; }
+.cat-icon { font-size: 1.3rem; }
+.cat-name { font-size: 0.95rem; font-weight: 700; color: #1a3a5c; }
+.cat-count {
+  font-size: 0.78rem;
+  background: #e8f0f8;
+  color: #2a5280;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+.cat-count.has-items { background: #c0392b; color: #fff; }
+.cat-arrow {
+  font-size: 0.85rem;
+  color: #7a9ab8;
+  transition: transform 0.25s ease;
+}
+.cat-arrow.open { transform: rotate(180deg); }
+
+.cat-body {
+  border-top: 1px solid #e8eef4;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+}
+.cat-body.open { max-height: 9999px; }
+
+/* チェックボックス行 */
+.check-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid #f0f4f8;
+  cursor: pointer;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  gap: 12px;
+}
+.check-row:last-child { border-bottom: none; }
+.check-row:hover { background: #f8fafc; }
+.check-row.checked { background: #fff5f5; }
+
+.custom-check {
+  width: 24px; height: 24px;
+  border: 2px solid #b0c4d8;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  background: #fff;
+}
+.check-row.checked .custom-check {
+  background: #c0392b;
+  border-color: #c0392b;
+}
+.custom-check::after {
+  content: '✕';
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: none;
+}
+.check-row.checked .custom-check::after { display: block; }
+
+.check-label { font-size: 0.92rem; color: #2d4a62; flex: 1; line-height: 1.4; }
+.check-row.checked .check-label { color: #c0392b; text-decoration: line-through; opacity: 0.75; }
+
+/* テキスト入力行 */
+.input-row {
+  padding: 12px 18px;
+  border-bottom: 1px solid #f0f4f8;
+}
+.input-row:last-child { border-bottom: none; }
+.input-row label { font-size: 0.9rem; color: #2d4a62; display: block; margin-bottom: 7px; }
+.input-row input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #cdd9e5;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #1a2a3a;
+  outline: none;
+  transition: border-color 0.2s;
+  background: #f8fafc;
+}
+.input-row input:focus { border-color: #2a5280; }
+.input-row input::placeholder { color: #aabbc8; }
+
+/* リアルタイム表示エリア */
+.result-area {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 10px rgba(26,58,92,0.07);
+  border: 1px solid #dce8f0;
+}
+.result-area h2 { font-size: 0.82rem; font-weight: 700; color: #7a9ab8; letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 12px; }
+.no-items { font-size: 0.87rem; color: #aabbc8; font-style: italic; }
+.result-category { margin-bottom: 12px; }
+.result-category:last-child { margin-bottom: 0; }
+.result-cat-name { font-size: 0.8rem; font-weight: 700; color: #2a5280; margin-bottom: 6px; }
+.result-list { list-style: none; }
+.result-list li {
+  font-size: 0.88rem;
+  color: #c0392b;
+  padding: 3px 0;
+  padding-left: 16px;
+  position: relative;
+}
+.result-list li::before { content: '✕'; position: absolute; left: 0; font-size: 0.75rem; color: #c0392b; }
+
+/* アクションボタン */
+.action-btns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.btn-copy-main {
+  width: 100%;
+  padding: 17px;
+  background: linear-gradient(135deg, #1a3a5c, #2a5280);
+  color: #fff;
+  border: none;
+  border-radius: 13px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(26,58,92,0.25);
+}
+.btn-copy-main:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(26,58,92,0.3); }
+.btn-copy-main:active { transform: translateY(0); }
+
+.btn-mail {
+  width: 100%;
+  padding: 17px;
+  background: linear-gradient(135deg, #c0392b, #e74c3c);
+  color: #fff;
+  border: none;
+  border-radius: 13px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(192,57,43,0.3);
+}
+.btn-mail:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(192,57,43,0.35); }
+.btn-mail:active { transform: translateY(0); }
+
+/* トースト */
+#toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #1a3a5c;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 9999;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <span class="emoji">📋</span>
+    <h1>アメニティチェックリスト</h1>
+    <p>石口さん用 ── 民泊物件のないアメニティを確認するツール</p>
+  </header>
+
+  <!-- 操作説明 -->
+  <div class="info-card">
+    <h2>📌 使い方</h2>
+    <ul>
+      <li>チェックを入れた項目が「ないアメニティリスト」に追加されます</li>
+      <li>チェックを外すとリストから削除されます</li>
+      <li>最後にまとめてコピーまたはメール送信できます</li>
+    </ul>
+  </div>
+
+  <!-- カテゴリ1: 洗面・バス -->
+  <div class="category">
+    <div class="cat-header" onclick="toggleCat(this)">
+      <div class="cat-header-left">
+        <span class="cat-icon">🛁</span>
+        <span class="cat-name">洗面・バス</span>
+        <span class="cat-count" id="count-bath">0</span>
+      </div>
+      <span class="cat-arrow">▼</span>
+    </div>
+    <div class="cat-body open" id="cat-bath">
+      <div class="check-row" onclick="toggleCheck(this,'bath','歯ブラシ')"><div class="custom-check"></div><span class="check-label">歯ブラシ</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'bath','歯磨き粉')"><div class="custom-check"></div><span class="check-label">歯磨き粉</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'bath','シャンプー')"><div class="custom-check"></div><span class="check-label">シャンプー</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'bath','コンディショナー')"><div class="custom-check"></div><span class="check-label">コンディショナー</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'bath','ボディソープ')"><div class="custom-check"></div><span class="check-label">ボディソープ</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'bath','タオル（バスタオル）')"><div class="custom-check"></div><span class="check-label">タオル（バスタオル）</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'bath','タオル（フェイスタオル）')"><div class="custom-check"></div><span class="check-label">タオル（フェイスタオル）</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'bath','ドライヤー')"><div class="custom-check"></div><span class="check-label">ドライヤー</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'bath','鏡')"><div class="custom-check"></div><span class="check-label">鏡</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'bath','カミソリ')"><div class="custom-check"></div><span class="check-label">カミソリ</span></div>
+    </div>
+  </div>
+
+  <!-- カテゴリ2: キッチン・食事 -->
+  <div class="category">
+    <div class="cat-header" onclick="toggleCat(this)">
+      <div class="cat-header-left">
+        <span class="cat-icon">🍳</span>
+        <span class="cat-name">キッチン・食事</span>
+        <span class="cat-count" id="count-kitchen">0</span>
+      </div>
+      <span class="cat-arrow">▼</span>
+    </div>
+    <div class="cat-body" id="cat-kitchen">
+      <div class="check-row" onclick="toggleCheck(this,'kitchen','電子レンジ')"><div class="custom-check"></div><span class="check-label">電子レンジ</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'kitchen','トースター')"><div class="custom-check"></div><span class="check-label">トースター</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'kitchen','電気ケトル')"><div class="custom-check"></div><span class="check-label">電気ケトル</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'kitchen','コーヒーメーカー')"><div class="custom-check"></div><span class="check-label">コーヒーメーカー</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'kitchen','食器（皿・茶碗）')"><div class="custom-check"></div><span class="check-label">食器（皿・茶碗）</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'kitchen','箸・カトラリー')"><div class="custom-check"></div><span class="check-label">箸・カトラリー</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'kitchen','鍋・フライパン')"><div class="custom-check"></div><span class="check-label">鍋・フライパン</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'kitchen','水切りかご')"><div class="custom-check"></div><span class="check-label">水切りかご</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'kitchen','食器用洗剤')"><div class="custom-check"></div><span class="check-label">食器用洗剤</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'kitchen','スポンジ')"><div class="custom-check"></div><span class="check-label">スポンジ</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'kitchen','ゴミ箱（分別）')"><div class="custom-check"></div><span class="check-label">ゴミ箱（分別）</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'kitchen','ラップ・アルミホイル')"><div class="custom-check"></div><span class="check-label">ラップ・アルミホイル</span></div>
+    </div>
+  </div>
+
+  <!-- カテゴリ3: 寝室・リビング -->
+  <div class="category">
+    <div class="cat-header" onclick="toggleCat(this)">
+      <div class="cat-header-left">
+        <span class="cat-icon">🛏️</span>
+        <span class="cat-name">寝室・リビング</span>
+        <span class="cat-count" id="count-room">0</span>
+      </div>
+      <span class="cat-arrow">▼</span>
+    </div>
+    <div class="cat-body" id="cat-room">
+      <div class="check-row" onclick="toggleCheck(this,'room','ハンガー・クローゼット')"><div class="custom-check"></div><span class="check-label">ハンガー・クローゼット</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'room','アイロン・アイロン台')"><div class="custom-check"></div><span class="check-label">アイロン・アイロン台</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'room','洗濯機')"><div class="custom-check"></div><span class="check-label">洗濯機</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'room','洗濯洗剤')"><div class="custom-check"></div><span class="check-label">洗濯洗剤</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'room','掃除機')"><div class="custom-check"></div><span class="check-label">掃除機</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'room','空気清浄機')"><div class="custom-check"></div><span class="check-label">空気清浄機</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'room','加湿器・除湿器')"><div class="custom-check"></div><span class="check-label">加湿器・除湿器</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'room','消臭スプレー')"><div class="custom-check"></div><span class="check-label">消臭スプレー</span></div>
+    </div>
+  </div>
+
+  <!-- カテゴリ4: 設備・その他 -->
+  <div class="category">
+    <div class="cat-header" onclick="toggleCat(this)">
+      <div class="cat-header-left">
+        <span class="cat-icon">⚙️</span>
+        <span class="cat-name">設備・その他</span>
+        <span class="cat-count" id="count-facility">0</span>
+      </div>
+      <span class="cat-arrow">▼</span>
+    </div>
+    <div class="cat-body" id="cat-facility">
+      <div class="check-row" onclick="toggleCheck(this,'facility','Wi-Fi')"><div class="custom-check"></div><span class="check-label">Wi-Fi</span></div>
+      <div class="input-row">
+        <label>コンセント口数（メモ）</label>
+        <input type="text" id="outlet-memo" placeholder="例: リビング2口、寝室1口" oninput="updateResult()">
+      </div>
+      <div class="check-row" onclick="toggleCheck(this,'facility','換気扇（浴室・キッチン等）')"><div class="custom-check"></div><span class="check-label">換気扇（浴室・キッチン等）</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'facility','冷暖房（エアコン）')"><div class="custom-check"></div><span class="check-label">冷暖房（エアコン）</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'facility','非常用持ち出し袋・救急箱')"><div class="custom-check"></div><span class="check-label">非常用持ち出し袋・救急箱</span></div>
+      <div class="check-row" onclick="toggleCheck(this,'facility','防犯グッズ（鍵の種類等）')"><div class="custom-check"></div><span class="check-label">防犯グッズ（鍵の種類等）</span></div>
+    </div>
+  </div>
+
+  <!-- リアルタイム表示 -->
+  <div class="result-area">
+    <h2>❌ ないアメニティリスト</h2>
+    <div id="result-content">
+      <p class="no-items">チェックした項目がここに表示されます</p>
+    </div>
+  </div>
+
+  <!-- アクションボタン -->
+  <div class="action-btns">
+    <button class="btn-copy-main" onclick="copyList()">📋 コピーする</button>
+    <button class="btn-mail" onclick="sendMail()">📧 メールで送信する</button>
+  </div>
+
+</div>
+
+<div id="toast">コピーしました！</div>
+
+<script>
+/* ===== データ ===== */
+const checkedItems = {
+  bath:     [],
+  kitchen:  [],
+  room:     [],
+  facility: []
+};
+
+const catNames = {
+  bath:     '【洗面・バス】',
+  kitchen:  '【キッチン・食事】',
+  room:     '【寝室・リビング】',
+  facility: '【設備・その他】'
+};
+
+/* ===== アコーディオン ===== */
+function toggleCat(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('.cat-arrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+/* ===== チェック操作 ===== */
+function toggleCheck(row, cat, itemName) {
+  row.classList.toggle('checked');
+  const arr = checkedItems[cat];
+  const idx = arr.indexOf(itemName);
+  if (idx === -1) {
+    arr.push(itemName);
+  } else {
+    arr.splice(idx, 1);
+  }
+  updateCountBadge(cat);
+  updateResult();
+}
+
+function updateCountBadge(cat) {
+  const badge = document.getElementById(`count-${cat}`);
+  const n = checkedItems[cat].length;
+  badge.textContent = n;
+  badge.classList.toggle('has-items', n > 0);
+}
+
+/* ===== リアルタイム表示 ===== */
+function updateResult() {
+  const content = document.getElementById('result-content');
+  const outletMemo = document.getElementById('outlet-memo').value.trim();
+  const hasAny = Object.values(checkedItems).some(a => a.length > 0) || outletMemo;
+
+  if (!hasAny) {
+    content.innerHTML = '<p class="no-items">チェックした項目がここに表示されます</p>';
+    return;
+  }
+
+  let html = '';
+  Object.entries(checkedItems).forEach(([cat, items]) => {
+    let catItems = [...items];
+    if (cat === 'facility' && outletMemo) {
+      catItems = [...catItems, `コンセント口数メモ: ${outletMemo}`];
+    }
+    if (catItems.length === 0) return;
+    html += `<div class="result-category">`;
+    html += `<div class="result-cat-name">${catNames[cat]}</div>`;
+    html += `<ul class="result-list">`;
+    catItems.forEach(item => { html += `<li>${escHtml(item)}</li>`; });
+    html += `</ul></div>`;
+  });
+
+  content.innerHTML = html || '<p class="no-items">チェックした項目がここに表示されます</p>';
+}
+
+/* ===== コピー ===== */
+function buildText() {
+  const today = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+  const outletMemo = document.getElementById('outlet-memo').value.trim();
+  let text = `【民泊アメニティチェック】ないアメニティリスト\n`;
+  text += `記入日: ${today}（石口さん記入分）\n\n`;
+
+  let hasAny = false;
+  Object.entries(checkedItems).forEach(([cat, items]) => {
+    let catItems = [...items];
+    if (cat === 'facility' && outletMemo) catItems.push(`コンセント口数メモ: ${outletMemo}`);
+    if (catItems.length === 0) return;
+    hasAny = true;
+    text += `${catNames[cat]}\n`;
+    catItems.forEach(i => { text += `・${i}\n`; });
+    text += '\n';
+  });
+
+  if (!hasAny) text += '（ないアメニティなし）\n';
+  return text;
+}
+
+function copyList() {
+  const text = buildText();
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('コピーしました！');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('コピーしました！');
+  });
+}
+
+/* ===== メール送信 ===== */
+function sendMail() {
+  const text = buildText();
+  const subject = '【民泊アメニティチェック】ないアメニティリスト';
+  const mailto = `mailto:teenageowl@aol.jp?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+  window.location.href = mailto;
+}
+
+/* ===== トースト ===== */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

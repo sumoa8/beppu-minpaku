@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民泊評価アンケート</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', system-ui, sans-serif;
+    background: linear-gradient(135deg, #fff8f0 0%, #ffecd2 100%);
+    min-height: 100vh;
+    padding: 16px;
+    color: #3d2b1f;
+  }
+
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    padding: 28px 16px 20px;
+  }
+  header .emoji { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+  header h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #8B4513;
+    margin-bottom: 6px;
+  }
+  header p {
+    font-size: 0.85rem;
+    color: #7a5c4a;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 12px rgba(139,69,19,0.08);
+    border: 1px solid #f5dfc8;
+  }
+
+  .card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #c87941;
+    margin-bottom: 12px;
+  }
+
+  /* 名前選択 */
+  .name-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .name-btn {
+    padding: 16px 8px;
+    border: 2px solid #e8c9a8;
+    border-radius: 12px;
+    background: #fff9f5;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #6b4226;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    min-height: 56px;
+  }
+  .name-btn:hover { border-color: #c87941; background: #fff3e8; }
+  .name-btn.selected {
+    border-color: #e67e22;
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(230,126,34,0.3);
+  }
+
+  /* スター評価 */
+  .rating-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #f5ece3;
+  }
+  .rating-item:last-child { border-bottom: none; }
+  .rating-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4a2f1a;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .stars {
+    display: flex;
+    gap: 8px;
+  }
+  .star {
+    font-size: 2rem;
+    cursor: pointer;
+    color: #ddd;
+    transition: color 0.15s, transform 0.12s;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .star:hover, .star.hovered { color: #f1c40f; transform: scale(1.15); }
+  .star.active { color: #f1c40f; }
+
+  /* コメント */
+  textarea {
+    width: 100%;
+    padding: 14px;
+    border: 1.5px solid #e8c9a8;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: #3d2b1f;
+    resize: vertical;
+    min-height: 100px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #fffaf6;
+  }
+  textarea:focus { border-color: #e67e22; }
+  textarea::placeholder { color: #c4a48a; }
+
+  /* 送信ボタン */
+  .btn-submit {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(230,126,34,0.35);
+    margin-bottom: 14px;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(230,126,34,0.4); }
+  .btn-submit:active { transform: translateY(0); }
+
+  /* 完了画面 */
+  #done-screen {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  #done-screen .big-emoji { font-size: 4rem; display: block; margin-bottom: 16px; }
+  #done-screen h2 { font-size: 1.5rem; font-weight: 700; color: #8B4513; margin-bottom: 10px; }
+  #done-screen p { font-size: 0.9rem; color: #7a5c4a; margin-bottom: 28px; }
+  .btn-reset {
+    padding: 14px 32px;
+    background: #fff;
+    border: 2px solid #e67e22;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #e67e22;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .btn-reset:hover { background: #fff3e8; }
+
+  /* アラート */
+  .alert-box {
+    background: #fff3cd;
+    border: 1.5px solid #ffc107;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.875rem;
+    color: #7a5c00;
+    margin-bottom: 12px;
+    display: none;
+  }
+  .alert-box.show { display: block; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <span class="emoji">🏠</span>
+    <h1>民泊評価アンケート</h1>
+    <p>ご宿泊の感想をお聞かせください</p>
+  </header>
+
+  <div id="form-screen">
+
+    <!-- 名前選択 -->
+    <div class="card">
+      <div class="card-title">👤 お名前を選んでください</div>
+      <div class="name-grid">
+        <button class="name-btn" data-name="石口さん" onclick="selectName(this)">石口さん</button>
+        <button class="name-btn" data-name="ちっちさん" onclick="selectName(this)">ちっちさん</button>
+        <button class="name-btn" data-name="まこつさん" onclick="selectName(this)">まこつさん</button>
+        <button class="name-btn" data-name="ハル" onclick="selectName(this)">ハル</button>
+      </div>
+    </div>
+
+    <!-- 評価項目 -->
+    <div class="card">
+      <div class="card-title">⭐ 各項目を評価してください</div>
+
+      <div class="rating-item">
+        <span class="rating-label">寝心地・布団の快適さ</span>
+        <div class="stars" data-key="bed">
+          <span class="star" data-val="1" onclick="setRating('bed',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('bed',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('bed',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('bed',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('bed',5)">★</span>
+        </div>
+      </div>
+
+      <div class="rating-item">
+        <span class="rating-label">枕の快適さ</span>
+        <div class="stars" data-key="pillow">
+          <span class="star" data-val="1" onclick="setRating('pillow',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('pillow',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('pillow',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('pillow',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('pillow',5)">★</span>
+        </div>
+      </div>
+
+      <div class="rating-item">
+        <span class="rating-label">シャワーの使いやすさ・水圧・温度</span>
+        <div class="stars" data-key="shower">
+          <span class="star" data-val="1" onclick="setRating('shower',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('shower',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('shower',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('shower',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('shower',5)">★</span>
+        </div>
+      </div>
+
+      <div class="rating-item">
+        <span class="rating-label">トイレの清潔さ・使い勝手</span>
+        <div class="stars" data-key="toilet">
+          <span class="star" data-val="1" onclick="setRating('toilet',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('toilet',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('toilet',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('toilet',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('toilet',5)">★</span>
+        </div>
+      </div>
+
+      <div class="rating-item">
+        <span class="rating-label">Wi-Fiの速度・安定性</span>
+        <div class="stars" data-key="wifi">
+          <span class="star" data-val="1" onclick="setRating('wifi',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('wifi',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('wifi',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('wifi',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('wifi',5)">★</span>
+        </div>
+      </div>
+
+      <div class="rating-item">
+        <span class="rating-label">コンセントの位置・数</span>
+        <div class="stars" data-key="outlet">
+          <span class="star" data-val="1" onclick="setRating('outlet',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('outlet',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('outlet',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('outlet',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('outlet',5)">★</span>
+        </div>
+      </div>
+
+      <div class="rating-item">
+        <span class="rating-label">共有スペースの広さ・使いやすさ</span>
+        <div class="stars" data-key="space">
+          <span class="star" data-val="1" onclick="setRating('space',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('space',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('space',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('space',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('space',5)">★</span>
+        </div>
+      </div>
+
+      <div class="rating-item">
+        <span class="rating-label">動線のわかりやすさ（入口〜各部屋）</span>
+        <div class="stars" data-key="flow">
+          <span class="star" data-val="1" onclick="setRating('flow',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('flow',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('flow',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('flow',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('flow',5)">★</span>
+        </div>
+      </div>
+
+      <div class="rating-item">
+        <span class="rating-label">照明の明るさ・操作のしやすさ</span>
+        <div class="stars" data-key="light">
+          <span class="star" data-val="1" onclick="setRating('light',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('light',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('light',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('light',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('light',5)">★</span>
+        </div>
+      </div>
+
+      <div class="rating-item">
+        <span class="rating-label">空調（エアコン等）の使いやすさ</span>
+        <div class="stars" data-key="ac">
+          <span class="star" data-val="1" onclick="setRating('ac',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('ac',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('ac',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('ac',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('ac',5)">★</span>
+        </div>
+      </div>
+
+      <div class="rating-item">
+        <span class="rating-label">全体的な清潔感</span>
+        <div class="stars" data-key="clean">
+          <span class="star" data-val="1" onclick="setRating('clean',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('clean',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('clean',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('clean',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('clean',5)">★</span>
+        </div>
+      </div>
+
+      <div class="rating-item">
+        <span class="rating-label">全体の満足度</span>
+        <div class="stars" data-key="overall">
+          <span class="star" data-val="1" onclick="setRating('overall',1)">★</span>
+          <span class="star" data-val="2" onclick="setRating('overall',2)">★</span>
+          <span class="star" data-val="3" onclick="setRating('overall',3)">★</span>
+          <span class="star" data-val="4" onclick="setRating('overall',4)">★</span>
+          <span class="star" data-val="5" onclick="setRating('overall',5)">★</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- コメント -->
+    <div class="card">
+      <div class="card-title">💬 自由コメント（任意）</div>
+      <textarea id="comment" placeholder="気になった点・改善してほしいこと・よかった点など、なんでも"></textarea>
+    </div>
+
+    <div class="alert-box" id="alert-box"></div>
+
+    <button class="btn-submit" onclick="submitForm()">📧 メールで送信する</button>
+  </div>
+
+  <!-- 完了画面 -->
+  <div id="done-screen">
+    <span class="big-emoji">🎉</span>
+    <h2>ありがとうございました！</h2>
+    <p>ご回答いただきありがとうございます。<br>メールアプリから送信してください。</p>
+    <button class="btn-reset" onclick="resetForm()">🔄 もう一度回答する</button>
+  </div>
+</div>
+
+<script>
+  const ratings = {};
+  const ratingLabels = {
+    bed:     '寝心地・布団の快適さ',
+    pillow:  '枕の快適さ',
+    shower:  'シャワーの使いやすさ・水圧・温度',
+    toilet:  'トイレの清潔さ・使い勝手',
+    wifi:    'Wi-Fiの速度・安定性',
+    outlet:  'コンセントの位置・数',
+    space:   '共有スペースの広さ・使いやすさ',
+    flow:    '動線のわかりやすさ（入口〜各部屋）',
+    light:   '照明の明るさ・操作のしやすさ',
+    ac:      '空調（エアコン等）の使いやすさ',
+    clean:   '全体的な清潔感',
+    overall: '全体の満足度'
+  };
+  let selectedName = '';
+
+  function selectName(btn) {
+    document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedName = btn.dataset.name;
+  }
+
+  function setRating(key, val) {
+    ratings[key] = val;
+    const container = document.querySelector(`.stars[data-key="${key}"]`);
+    container.querySelectorAll('.star').forEach(s => {
+      s.classList.toggle('active', parseInt(s.dataset.val) <= val);
+    });
+  }
+
+  function starsText(val) {
+    return '★'.repeat(val) + '☆'.repeat(5 - val);
+  }
+
+  function submitForm() {
+    const alertBox = document.getElementById('alert-box');
+    const missing = [];
+
+    if (!selectedName) missing.push('お名前');
+    Object.keys(ratingLabels).forEach(key => {
+      if (!ratings[key]) missing.push(ratingLabels[key]);
+    });
+
+    if (missing.length > 0) {
+      alertBox.textContent = '⚠️ 未入力の項目があります：' + missing.join('、');
+      alertBox.classList.add('show');
+      alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    alertBox.classList.remove('show');
+
+    const today = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+    const comment = document.getElementById('comment').value;
+
+    let body = `【民泊アンケート】${selectedName}さんの評価\n`;
+    body += `回答日: ${today}\n`;
+    body += `回答者: ${selectedName}\n\n`;
+    body += `■ 評価項目\n`;
+    Object.keys(ratingLabels).forEach(key => {
+      body += `${ratingLabels[key]}: ${starsText(ratings[key])} (${ratings[key]}/5)\n`;
+    });
+    if (comment.trim()) {
+      body += `\n■ 自由コメント\n${comment.trim()}\n`;
+    }
+
+    const subject = `【民泊アンケート】${selectedName}さんの評価`;
+    const mailto = `mailto:teenageowl@aol.jp?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+
+    setTimeout(() => {
+      document.getElementById('form-screen').style.display = 'none';
+      document.getElementById('done-screen').style.display = 'block';
+    }, 800);
+  }
+
+  function resetForm() {
+    selectedName = '';
+    Object.keys(ratings).forEach(k => delete ratings[k]);
+    document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+    document.getElementById('comment').value = '';
+    document.getElementById('alert-box').classList.remove('show');
+    document.getElementById('form-screen').style.display = 'block';
+    document.getElementById('done-screen').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
